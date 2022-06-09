@@ -1,5 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
+/* ./styles/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .nft-gradient {
    background: linear-gradient(101.12deg, #EB1484 27.35%, #C91CC3 99.99%, #C81CC5 100%, #C81CC5 100%);
 }
@@ -27,6 +32,7 @@
 .checkbox {
     opacity: 0;
     position: absolute;
+    cursor: pointer;
 }
   
 .label {
@@ -34,8 +40,8 @@
 }
   
 .ball {
-    top: 2px;
-    left: 2px;
+    top: 6px;
+    left: 6px;   
     transition: transform 0.2s linear;
 }
   
@@ -46,12 +52,12 @@
   
 .fa-moon {
     color: pink;
-    font-size: 9px;
+    /* font-size: 9px; */
 }
   
 .fa-sun {
     color: yellow;
-    font-size: 9px;
+    /* font-size: 9px; */
 }
 
 .animated {
@@ -114,7 +120,3 @@
     }
 }
 
-/* ./styles/globals.css */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;

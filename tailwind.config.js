@@ -20,7 +20,8 @@ module.exports = {
         'file-active': '#2196f3',
         'file-accept': '#00e676',
         'file-reject': '#ff1744',
-        'overlay-black': 'rgba(0, 0, 0, 0.8)',
+        'overlay-black': 'rgba(0, 0, 0, 0.5)',
+        'overlay-white': 'rgba(255, 255, 255, 0.95)',
       },
       width: {
         215: '215px',
