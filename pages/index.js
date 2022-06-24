@@ -1,15 +1,25 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useContext } from 'react';
 import Image from 'next/image';
 import { ThemeProvider, useTheme } from 'next-themes';
 
 import { Banner, CreatorCard, NFTCard } from '../components';
 import images from '../assets';
+import { NFTContext } from '../context/NFTContext';
 
 const Home = () => {
   const [hideSlideButton, setHideSlideButton] = useState(false);
   const { theme } = useTheme();
   const parentRef = useRef(null);
   const scrollRef = useRef(null);
+  const { fetchNFTs } = useContext(NFTContext);
+  const [nfts, setNfts] = useState([]);
+
+  useEffect(() => {
+    fetchNFTs().then((items) => {
+      setNfts(items);
+      console.log('items', items);
+    });
+  }, []);
 
   const handleScroll = (direction) => {
     const { current } = scrollRef;
@@ -66,17 +76,10 @@ const Home = () => {
           <p className="font-poppins text-nft-black-1 dark:text-nft-gray-1 font-semibold text-2xl mt-3 ml-4">Hot Bids</p>
           <div>Search bar</div>
           <div className="flex w-full flex-wrap justify-start md:justify-center">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+            {nfts.map((nft) => (
               <NFTCard
-                key={`nft_${i}`}
-                nft={{
-                  i,
-                  name: `Nifty NFT ${i}`,
-                  price: 10 - 0.5 * i,
-                  seller: '099...abcd',
-                  owner: '088...mxyz',
-                }}
-
+                key={nft.tokenId}
+                nft={nft}
               />
             ))}
           </div>

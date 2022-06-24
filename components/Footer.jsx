@@ -71,7 +71,7 @@ const Footer = () => {
           <div className={styles.copyright__social}>
             {
             [images.instagram, images.telegram, images.twitter, images.discord].map((item, idx) => (
-              <div className={styles.social__items}>
+              <div className={styles.social__items} key={idx}>
                 <Link href="/" key={idx}>
                   <Image src={item} width={20} height={20} className={`${styles.social__item} ${theme === 'light' && 'filter invert'}`} />
                 </Link>

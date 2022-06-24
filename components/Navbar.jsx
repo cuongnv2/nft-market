@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { useRouter } from 'next/router';
 import images from '../assets';
 import Button from './Button';
+import { NFTContext } from '../context/NFTContext';
+import { shortenAddress } from '../utils/index';
 
 const styles = {
   navbar: 'bg-white dark:bg-nft-dark w-full flex flexBetween border-b dark:border-nft-black-1 border-nft-gray-1 p-4',
@@ -26,7 +29,7 @@ const generateLink = (i) => {
     case 0:
       return '/';
     case 1:
-      return '/created-nft';
+      return '/listed-nft';
     case 2:
       return '/my-nfts';
     default:
@@ -52,9 +55,16 @@ const MenuItems = ({ activeMenu, setActiveMenu }) => (
   </div>
 );
 
-const ButtonGroup = ({ hasConnect }) => (
+const ButtonGroup = ({ currentAccount, connectWallet, router }) => (
   <div>
-    {hasConnect ? <Button btnText="Create" customStyle="text-white" /> : <Button btnText="Connect" customStyle="text-white" />}
+    {currentAccount ? (
+      <Button
+        btnText="Create"
+        customStyle="text-white"
+        handleClick={() => { console.log('click...'); router.push('/create-nft'); }}
+      />
+    )
+      : <Button btnText="Connect" customStyle="text-white" handleClick={connectWallet} />}
   </div>
 );
 
@@ -80,15 +90,16 @@ const ToggleTheme = ({ theme, setTheme }) => (
   </div>
 );
 
-const MenuList = ({ activeMenu, setActiveMenu }) => (
+const MenuList = ({ activeMenu, setActiveMenu, currentAccount, connectWallet, router }) => (
   <div className={styles.right__menu}>
     <MenuItems activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
     <div className={styles.right__button} />
-    <ButtonGroup />
+    <ButtonGroup currentAccount={currentAccount} connectWallet={connectWallet} router={router} />
+    <span className="text-white text-sm">{currentAccount && shortenAddress(currentAccount)}</span>
   </div>
 );
 
-const MobileMenu = ({ open, setOpen, activeMenu, setActiveMenu, theme }) => (
+const MobileMenu = ({ open, setOpen, activeMenu, setActiveMenu, theme, currentAccount, connectWallet, router }) => (
   <div className={styles.right__humberger}>
     { !open && <Image src={images.menu} width={25} height={25} onClick={() => setOpen(true)} className={theme === 'light' && 'filter invert'} />}
     { open && <Image src={images.cross} width={25} height={25} onClick={() => setOpen(false)} className={theme === 'light' && 'filter invert'} />}
@@ -98,31 +109,37 @@ const MobileMenu = ({ open, setOpen, activeMenu, setActiveMenu, theme }) => (
         <MenuItems activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
       </div>
       <div>
-        <ButtonGroup />
+        <ButtonGroup currentAccount={currentAccount} connectWallet={connectWallet} router={router} />
       </div>
     </div>
     )}
   </div>
 );
 
-const RightNavbar = ({ open, setOpen, activeMenu, setActiveMenu, theme, setTheme }) => (
+const RightNavbar = ({ open, setOpen, activeMenu, setActiveMenu, theme, setTheme, currentAccount, connectWallet, router }) => (
   <div className={styles.navbar__right}>
     <ToggleTheme theme={theme} setTheme={setTheme} />
-    <MenuList activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
+    <MenuList activeMenu={activeMenu} setActiveMenu={setActiveMenu} currentAccount={currentAccount} connectWallet={connectWallet} router={router} />
     <MobileMenu
       open={open}
       setOpen={setOpen}
       activeMenu={activeMenu}
       setActiveMenu={setActiveMenu}
       theme={theme}
+      currentAccount={currentAccount}
+      connectWallet={connectWallet}
+      router={router}
     />
   </div>
 );
 
 const Navbar = () => {
+  const router = useRouter();
+  const { currentAccount, connectWallet } = useContext(NFTContext);
   const { theme, setTheme } = useTheme();
   const [activeMenu, setActiveMenu] = useState('Explore NFTs');
   const [open, setOpen] = useState(false);
+  console.log('currentAccount', currentAccount);
 
   return (
     <div className={styles.navbar}>
@@ -134,6 +151,9 @@ const Navbar = () => {
         setActiveMenu={setActiveMenu}
         theme={theme}
         setTheme={setTheme}
+        currentAccount={currentAccount}
+        connectWallet={connectWallet}
+        router={router}
       />
     </div>
 
