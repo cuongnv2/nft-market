@@ -4,8 +4,7 @@ import Image from 'next/image';
 import images from '../assets';
 import { NFTContext } from '../context/NFTContext';
 
-const CreatorCard = ({ rank, image }) => {
-  console.log('');
+const CreatorCard = ({ rank, image, name, asset }) => {
   const { nftCurrency } = useContext(NFTContext);
   return (
     <div
@@ -30,8 +29,8 @@ const CreatorCard = ({ rank, image }) => {
         </div>
       </div>
       <div className="flex items-center flex-col mt-3">
-        <p className="font-poppins font-semibold">0x6o2...u8yg</p>
-        <span className="font-poppins font-semibold inline">{10 - rank * 0.5} {nftCurrency}</span>
+        <p className="font-poppins font-semibold">{name}</p>
+        <span className="font-poppins font-semibold inline">{asset} {nftCurrency}</span>
       </div>
     </div>
   );

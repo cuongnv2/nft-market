@@ -1,23 +1,26 @@
 import { useState, useEffect, useRef, useContext } from 'react';
 import Image from 'next/image';
-import { ThemeProvider, useTheme } from 'next-themes';
+import { useTheme } from 'next-themes';
 
-import { Banner, CreatorCard, NFTCard } from '../components';
+import { Banner, CreatorCard, NFTCard, SearchBar } from '../components';
 import images from '../assets';
 import { NFTContext } from '../context/NFTContext';
+import { getCreators, shortenAddress } from '../utils';
 
 const Home = () => {
   const [hideSlideButton, setHideSlideButton] = useState(false);
+  const [activeSelect, setActiveSelect] = useState('Recently Added');
   const { theme } = useTheme();
   const parentRef = useRef(null);
   const scrollRef = useRef(null);
   const { fetchNFTs } = useContext(NFTContext);
   const [nfts, setNfts] = useState([]);
+  const [nftsCopy, setNftsCopy] = useState([]);
 
   useEffect(() => {
     fetchNFTs().then((items) => {
       setNfts(items);
-      console.log('items', items);
+      setNftsCopy(items);
     });
   }, []);
 
@@ -44,19 +47,55 @@ const Home = () => {
     return () => window.removeEventListener('resize', isScrollable);
   });
 
+  const topCreators = getCreators(nfts);
+
+  const onHandleSearch = (value) => {
+    const filteredNFTs = nfts.filter(({ name }) => name.toLowerCase().includes(value.toLowerCase()));
+    if (filteredNFTs.length) { setNfts(filteredNFTs); } else setNfts(nftsCopy);
+  };
+
+  const onClearSearch = () => {
+    if (nfts.length && nftsCopy.length) {
+      setNfts(nftsCopy);
+    }
+  };
+
+  useEffect(() => {
+    const sortedNFTs = [...nfts];
+    switch (activeSelect) {
+      case 'Price (low to high)':
+        setNfts(sortedNFTs.sort((a, b) => a.price - b.price));
+        break;
+      case 'Price (high to low)':
+        setNfts(sortedNFTs.sort((a, b) => b.price - a.price));
+        break;
+      case 'Recently added':
+        setNfts(sortedNFTs.sort((a, b) => b.tokenId - a.tokenId));
+        break;
+      default:
+        break;
+    }
+  }, [activeSelect]);
+
   return (
     <div className="flex justify-center">
       <div className="w-full minmd:w-4/5 my-3 px-4">
-        <Banner />
+        <Banner
+          name="Discover, collect, and sell extraodinary NFTs"
+          parentStyles="justify-start mb-6 h-72 sm:h-60 p-12 xs:p-4 xs:h-44 rounded-3xl"
+          childStyles="md:text-4xl sm:text-2xl xs:text-xl text-left"
+        />
         <div>
           <p className="font-poppins text-nft-black-1 dark:text-nft-gray-1 font-semibold text-2xl mt-3 ml-4">Best Creators</p>
           <div className="relative flex mt-3 max-w-full" ref={parentRef}>
             <div className="flex overflow-x-scroll no-scrollbar w-max select-none" ref={scrollRef}>
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+              {topCreators.map((creator, i) => (
                 <CreatorCard
-                  key={`creator_${i}`}
-                  rank={i}
-                  image={images[`creator${i}`]}
+                  key={`creator_${creator.seller}`}
+                  rank={i + 1}
+                  image={images[`creator${i + 1}`]}
+                  name={shortenAddress(creator.seller)}
+                  asset={creator.sum}
                 />
               ))}
               { !hideSlideButton && (
@@ -72,9 +111,18 @@ const Home = () => {
             </div>
           </div>
         </div>
+        <div className="flex sm:flex-col">
+          <p className="font-poppins text-nft-black-1 dark:text-nft-gray-1 font-semibold text-2xl mt-3 ml-4 flex-1">Hot Bids</p>
+          <div className="flex w-full justify-end mt-3 ml-4 flex-2">
+            <SearchBar
+              activeSelect={activeSelect}
+              setActiveSelect={setActiveSelect}
+              handleSearch={onHandleSearch}
+              clearSearch={onClearSearch}
+            />
+          </div>
+        </div>
         <div>
-          <p className="font-poppins text-nft-black-1 dark:text-nft-gray-1 font-semibold text-2xl mt-3 ml-4">Hot Bids</p>
-          <div>Search bar</div>
           <div className="flex w-full flex-wrap justify-start md:justify-center">
             {nfts.map((nft) => (
               <NFTCard

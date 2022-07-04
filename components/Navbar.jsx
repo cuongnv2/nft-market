@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { useRouter } from 'next/router';
+import { isMobile } from 'web3modal';
 import images from '../assets';
 import Button from './Button';
 import { NFTContext } from '../context/NFTContext';
@@ -21,7 +22,7 @@ const styles = {
   item__active: 'text-nft-black-1 dark:text-white',
   item__inactive: 'text-nft-gray-2 dark:text-nft-gray-3',
   right__humberger: 'md:flex hidden ml-2',
-  menu__mobile: 'fixed inset-0 top-65 flex flex-col justify-between items-center nav-h z-10 bg-overlay-black',
+  menu__mobile: 'fixed inset-0 top-65 flex flex-col justify-between items-center nav-h z-50 bg-black',
 };
 
 const generateLink = (i) => {
@@ -37,13 +38,16 @@ const generateLink = (i) => {
   }
 };
 
-const MenuItems = ({ activeMenu, setActiveMenu }) => (
+const MenuItems = ({ activeMenu, setActiveMenu, setOpen }) => (
   <div className={styles.menu__container}> {
     ['Explore NFTs', 'Listed NFTs', 'My NFTs'].map((item, idx) => (
       <ul className={styles.menu__list} key={`nav_${idx}`}>
         <li
           className={`${styles.menu__item} ${activeMenu === item ? styles.item__active : styles.item__inactive}`}
-          onClick={() => setActiveMenu(item)}
+          onClick={() => {
+            setActiveMenu(item);
+            if (isMobile) setOpen(false);
+          }}
         >
           <Link href={generateLink(idx)}>
             {item}
@@ -90,9 +94,9 @@ const ToggleTheme = ({ theme, setTheme }) => (
   </div>
 );
 
-const MenuList = ({ activeMenu, setActiveMenu, currentAccount, connectWallet, router }) => (
+const MenuList = ({ activeMenu, setActiveMenu, currentAccount, connectWallet, router, setOpen }) => (
   <div className={styles.right__menu}>
-    <MenuItems activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
+    <MenuItems activeMenu={activeMenu} setActiveMenu={setActiveMenu} setOpen={setOpen} />
     <div className={styles.right__button} />
     <ButtonGroup currentAccount={currentAccount} connectWallet={connectWallet} router={router} />
     <span className="text-white text-sm">{currentAccount && shortenAddress(currentAccount)}</span>
@@ -106,7 +110,7 @@ const MobileMenu = ({ open, setOpen, activeMenu, setActiveMenu, theme, currentAc
     { open && (
     <div className={styles.menu__mobile}>
       <div className="flex-1">
-        <MenuItems activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
+        <MenuItems activeMenu={activeMenu} setActiveMenu={setActiveMenu} setOpen={setOpen} />
       </div>
       <div>
         <ButtonGroup currentAccount={currentAccount} connectWallet={connectWallet} router={router} />
@@ -139,7 +143,6 @@ const Navbar = () => {
   const { theme, setTheme } = useTheme();
   const [activeMenu, setActiveMenu] = useState('Explore NFTs');
   const [open, setOpen] = useState(false);
-  console.log('currentAccount', currentAccount);
 
   return (
     <div className={styles.navbar}>

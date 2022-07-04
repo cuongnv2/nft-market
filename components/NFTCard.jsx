@@ -6,8 +6,7 @@ import images from '../assets';
 import { NFTContext } from '../context/NFTContext';
 import { shortenAddress } from '../utils/index';
 
-const NFTCard = ({ nft }) => {
-  console.log('nft', nft);
+const NFTCard = ({ nft, showOwner }) => {
   const { nftCurrency } = useContext(NFTContext);
   return (
     <Link href={{ pathname: '/nft-details', query: nft }}>
@@ -21,7 +20,8 @@ const NFTCard = ({ nft }) => {
           <p className="font-poppins font-semibold">{nft.name}</p>
           <div className="flexBetween mt-2 text-sm font-poppins font-semibold">
             <div>{nft.price} {nftCurrency}</div>
-            <div>{shortenAddress(nft.owner)}</div>
+            <div>{showOwner ? shortenAddress(nft.owner) : shortenAddress(nft.seller)}</div>
+            {/* <div>{shortenAddress(nft.owner)}</div> */}
           </div>
         </div>
       </div>
